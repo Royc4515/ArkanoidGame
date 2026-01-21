@@ -1,51 +1,66 @@
-# Arkanoid Game (Assignment 5)
+# 🧱 Arkanoid Game (Assignment 5)
 
-A Java implementation of the classic Arkanoid game, developed as part of a programming assignment.
+> A fast-paced, object-oriented implementation of the classic arcade game Arkanoid.
 
-## Description
-This project recreates the gameplay of Arkanoid/Breakout. The player controls a paddle to bounce a ball and destroy blocks. The game features:
--   Sprite-based animation system
--   Collision detection
--   Score tracking
--   Win/Loss conditions
+![Java](https://img.shields.io/badge/Java-17%2B-orange)
+![License](https://img.shields.io/badge/License-MIT-blue)
+![Course](https://img.shields.io/badge/Course-OOP-green)
 
-## Project Structure
--   `src/`: Source code files.
--   `biuoop-1.4.jar`: Required library for GUI and drawing.
--   `run_game.ps1`: PowerShell script to verify and run the game easily.
+## 🎮 Overview
 
-## How to Run
+Welcome to my Java implementation of Arkanoid! This project was built as part of an extensive Object-Oriented Programming (OOP) assignment. It features a custom game engine, sprite management, collision detection, and a scoring system.
+
+**Key Features:**
+*   **Smooth Animation Loop**: Custom-built game loop running at 60 FPS.
+*   **Collision Detection**: Precise physics for ball-block and ball-paddle interactions.
+*   **Dynamic Gameplay**: Colored blocks to destroy, with "Death Regions" to avoid.
+*   **Pause Feature**: Need a break? Just hit `P`.
+
+## 👾 The Lore (Fun Fact)
+You might notice something special about the game's background...
+
+> 🎨 **Behind the Scenes**: The background image is an AI-generated masterpiece featuring the **Mighty Hero of OOP, Zvika Berger**, in an epic attempt to explain complex software design patterns to our lecturer, **Dr. Marina Kogan**. Does he succeed? Only by clearing all the blocks can you find out!
+
+## 🕹️ Game Controls
+
+| Key | Action |
+| :---: | :--- |
+| **⬅️ Left Arrow** | Move Paddle Left |
+| **➡️ Right Arrow** | Move Paddle Right |
+| **P** | Pause Game |
+| **Space** | Resume Game (from Pause) |
+
+## 🚀 How to Run
 
 ### Prerequisites
--   Java Development Kit (JDK) installed (Java 17+ recommended).
+*   **Java Development Kit (JDK)**: Version 17 or higher.
 
-### Using the Script (Recommended)
-Run the included PowerShell script from the project root:
+### Quick Start (Recommended)
+We've included a handy script to handle the classpath for you. Just run:
+
 ```powershell
 ./run_game.ps1
 ```
 
-### Manual Compilation & Execution
-If you prefer running manual commands:
+### Manual Run
+If you prefer the command line:
 
-**Compile:**
-```bash
-javac -cp "biuoop-1.4.jar;src" src/Ass5Game.java -d bin
-```
+1.  **Compile:**
+    ```bash
+    javac -cp "biuoop-1.4.jar;src" src/Ass5Game.java -d bin
+    ```
+2.  **Run:**
+    ```bash
+    java -cp "biuoop-1.4.jar;bin" Ass5Game
+    ```
 
-**Run:**
-```bash
-java -cp "biuoop-1.4.jar;bin" Ass5Game
-```
+## 📂 Project Structure
+*   `src/`: Main source code (Game logic, Sprites, Geometry, Listeners).
+*   `biuoop-1.4.jar`: The graphics library used for the GUI.
+*   `run_game.ps1`: Automation script for easy execution.
 
-## Game Controls
--   **Left Arrow**: Move Paddle Left
--   **Right Arrow**: Move Paddle Right
--   **P**: Pause Game (if implemented)
--   **Space**: Resume (if implemented)
+## 📜 License
+This project is open-source and available under the [MIT License](LICENSE).
 
-## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Author
-Roy Yanai Carmelli
+---
+*Created by Roy Yanai Carmelli*
