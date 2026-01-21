@@ -1,0 +1,22 @@
+### Build Artifacts ###
+bin/
+out/
+*.class
+*.log
+
+### IDE Files ###
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+### OS Files ###
+.DS_Store
+Thumbs.db
+
+### Personal / Temporary Files ###
+*.zip
+*.pdf
+New folder/
