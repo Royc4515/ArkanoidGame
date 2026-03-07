@@ -1,9 +1,10 @@
 package geometry;
-import sprites.Ball;
+
 /**
  * Represents a point in a 2D space with x and y coordinates.
  */
 public class Point {
+    private static final double EPSILON = 1e-5;
     private final double x;
     private final double y;
 
@@ -37,7 +38,7 @@ public class Point {
      * @return {@code true} if the points are equal, {@code false} otherwise.
      */
     public boolean equals(Point other) {
-        return Ball.doubleEquals(this.x, other.x) && Ball.doubleEquals(this.y, other.y);
+        return Math.abs(this.x - other.x) < EPSILON && Math.abs(this.y - other.y) < EPSILON;
     }
 
     /**

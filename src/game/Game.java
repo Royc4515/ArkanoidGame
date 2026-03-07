@@ -176,7 +176,8 @@ public class Game {
             Color color = new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256));
             Ball ball = new Ball(new Point(x, y), BALL_RADIUS, color);
             double speed = 5;
-            double angle = rand.nextInt(360);
+            // Restrict to upward-going angles (30–150°) so balls don't immediately fall into the death region
+            double angle = rand.nextInt(121) + 30;
             ball.setVelocity(Velocity.fromAngleAndSpeed(angle, speed));
             ball.setEnvironment(environment);
             ball.addToGame(this);
@@ -189,8 +190,8 @@ public class Game {
      */
     private void createWalls() {
         int[][] walls = {
-                { 0, 0, 820, 20 }, // Top wall
-                { 0, 0, 20, 620 }, // Left wall
+                { 0, 20, 820, 20 }, // Top wall (below score strip)
+                { 0, 0, 20, 620 },  // Left wall
                 { 780, 0, 20, 620 } // Right wall
         };
 

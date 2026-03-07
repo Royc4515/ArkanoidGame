@@ -16,7 +16,7 @@ public class BallRemover implements HitListener {
      * Constructs a BallRemover with access to the game and ball counter.
      *
      * @param game the game instance
-     * @param remainingBalls the counter tracking remaining blocks
+     * @param remainingBalls the counter tracking remaining balls
      */
     public BallRemover(Game game, Counter remainingBalls) {
         this.game = game;
