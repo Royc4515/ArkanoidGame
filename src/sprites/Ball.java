@@ -24,7 +24,6 @@ public class Ball implements Sprite {
     private Color color;
     private Point center;
     private Velocity velocity;
-    private double speed;
     private GameEnvironment environment;
 
     /**
@@ -55,15 +54,6 @@ public class Ball implements Sprite {
         this.radius = radius;
         this.color = color;
         this.velocity = new Velocity(0, 0);
-        this.calculateSpeed();
-    }
-
-    /**
-     * Calculates the speed based on the ball's radius.
-     * Larger balls move slower than smaller ones.
-     */
-    private void calculateSpeed() {
-        this.speed = (radius > 50) ? 1 : 50.0 / radius;
     }
 
     /**
@@ -91,15 +81,6 @@ public class Ball implements Sprite {
      */
     public Color getColor() {
         return color;
-    }
-
-    /**
-     * Returns the current calculated speed of the ball.
-     *
-     * @return speed
-     */
-    public double getSpeed() {
-        return speed;
     }
 
     /**
@@ -223,17 +204,39 @@ public class Ball implements Sprite {
 
     /**
      * If the ball gets stuck inside a collidable object,
-     * this method tries to move it slightly upward and reflect its velocity.
+     * reflects the velocity and ejects the ball toward the nearest edge.
      *
-     * @param epsilon the amount to nudge the ball by
+     * @param epsilon the amount to nudge the ball beyond the edge
      */
     public void handleMovingTowards(double epsilon) {
         for (Collidable c : environment.getCollidables()) {
             Rectangle rect = c.getCollisionRectangle();
             if (rect.contains(this.center)) {
                 this.velocity = c.hit(this, this.center, this.velocity);
-                double newX = this.center.getX();
-                double newY = rect.getUpperLeft().getY() - epsilon;
+                double bx = this.center.getX();
+                double by = this.center.getY();
+                double left = rect.getUpperLeft().getX();
+                double top = rect.getUpperLeft().getY();
+                double right = left + rect.getWidth();
+                double bottom = top + rect.getHeight();
+
+                double dLeft = bx - left;
+                double dRight = right - bx;
+                double dTop = by - top;
+                double dBottom = bottom - by;
+                double min = Math.min(Math.min(dLeft, dRight), Math.min(dTop, dBottom));
+
+                double newX = bx;
+                double newY = by;
+                if (min == dTop) {
+                    newY = top - epsilon;
+                } else if (min == dBottom) {
+                    newY = bottom + epsilon;
+                } else if (min == dLeft) {
+                    newX = left - epsilon;
+                } else {
+                    newX = right + epsilon;
+                }
                 this.center = new Point(newX, newY);
                 break;
             }
