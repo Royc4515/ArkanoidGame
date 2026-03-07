@@ -29,27 +29,29 @@ public class Paddle implements Sprite, Collidable {
         this.keyboard = keyboard;
     }
 
+    // Left wall ends at x=20, right wall starts at x=780
+    private static final int LEFT_BOUNDARY = 20;
+    private static final int RIGHT_BOUNDARY = 780;
+
     /**
-     * Moves the paddle left by its speed. If it goes beyond the left edge,
-     * it wraps around to the right edge.
+     * Moves the paddle left by its speed, clamped to the left wall boundary.
      */
     public void moveLeft() {
         double newX = this.rectangle.getUpperLeft().getX() - this.speed;
-        if (newX + this.rectangle.getWidth() < 0) {
-            newX = Game.SCREEN_WIDTH;
+        if (newX < LEFT_BOUNDARY) {
+            newX = LEFT_BOUNDARY;
         }
         rectangle = new Rectangle(new Point(newX, this.rectangle.getUpperLeft().getY()),
                 this.rectangle.getWidth(), this.rectangle.getHeight(), this.rectangle.getColor());
     }
 
     /**
-     * Moves the paddle right by its speed. If it goes beyond the right edge,
-     * it wraps around to the left edge.
+     * Moves the paddle right by its speed, clamped to the right wall boundary.
      */
     public void moveRight() {
         double newX = this.rectangle.getUpperLeft().getX() + this.speed;
-        if (newX > Game.SCREEN_WIDTH) {
-            newX = -this.rectangle.getWidth();
+        if (newX + this.rectangle.getWidth() > RIGHT_BOUNDARY) {
+            newX = RIGHT_BOUNDARY - this.rectangle.getWidth();
         }
         rectangle = new Rectangle(new Point(newX, this.rectangle.getUpperLeft().getY()),
                 this.rectangle.getWidth(), this.rectangle.getHeight(), this.rectangle.getColor());

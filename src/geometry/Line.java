@@ -1,6 +1,5 @@
 package geometry;
 import java.util.ArrayList;
-import sprites.Ball;
 
 /**
  * Represents a 2D line segment defined by a start and end {@link Point}.
@@ -9,6 +8,12 @@ import sprites.Ball;
 public class Line {
     private final Point start;
     private final Point end;
+
+    private static final double EPSILON = 1e-5;
+
+    private static boolean doubleEquals(double a, double b) {
+        return Math.abs(a - b) < EPSILON;
+    }
 
     /**
      * Constructs a line from two points.
@@ -82,10 +87,10 @@ public class Line {
         double x3 = other.start.getX(), y3 = other.start.getY();
         double x4 = other.end.getX(), y4 = other.end.getY();
 
-        boolean thisVertical = Ball.doubleEquals(x2, x1);
-        boolean otherVertical = Ball.doubleEquals(x4, x3);
-        boolean thisHorizontal = Ball.doubleEquals(y2, y1);
-        boolean otherHorizontal = Ball.doubleEquals(y4, y3);
+        boolean thisVertical = doubleEquals(x2, x1);
+        boolean otherVertical = doubleEquals(x4, x3);
+        boolean thisHorizontal = doubleEquals(y2, y1);
+        boolean otherHorizontal = doubleEquals(y4, y3);
 
         if (thisVertical && otherVertical) {
             return handleParallelIntersection(this.start, this.end, other.start, other.end, true);
@@ -98,7 +103,7 @@ public class Line {
         Double m1 = thisVertical ? null : (y2 - y1) / (x2 - x1);
         Double m2 = otherVertical ? null : (y4 - y3) / (x4 - x3);
 
-        if (m1 != null && m2 != null && Ball.doubleEquals(m1, m2)) {
+        if (m1 != null && m2 != null && doubleEquals(m1, m2)) {
             return handleCollinearIntersection(this.start, this.end, other.start, other.end, m1);
         }
 
@@ -217,14 +222,14 @@ public class Line {
         double bStart = vertical ? b1.getY() : b1.getX();
         double bEnd = vertical ? b2.getY() : b2.getX();
 
-        if (!Ball.doubleEquals(c1, c2)) {
+        if (!doubleEquals(c1, c2)) {
             return null;
         }
 
-        if (Ball.doubleEquals(aStart, bStart) || Ball.doubleEquals(aStart, bEnd)) {
+        if (doubleEquals(aStart, bStart) || doubleEquals(aStart, bEnd)) {
             return vertical ? new Point(c1, aStart) : new Point(aStart, c1);
         }
-        if (Ball.doubleEquals(aEnd, bStart) || Ball.doubleEquals(aEnd, bEnd)) {
+        if (doubleEquals(aEnd, bStart) || doubleEquals(aEnd, bEnd)) {
             return vertical ? new Point(c1, aEnd) : new Point(aEnd, c1);
         }
 
@@ -239,7 +244,7 @@ public class Line {
         double bA = a1.getY() - m * a1.getX();
         double bB = b1.getY() - m * b1.getX();
 
-        if (!Ball.doubleEquals(bA, bB)) {
+        if (!doubleEquals(bA, bB)) {
             return null;
         }
 
@@ -287,18 +292,18 @@ public class Line {
     }
 
     private boolean checkOverlap(Line other) {
-        boolean thisVert = Ball.doubleEquals(end.getX(), start.getX());
-        boolean otherVert = Ball.doubleEquals(other.end.getX(), other.start.getX());
-        boolean thisHor = Ball.doubleEquals(end.getY(), start.getY());
-        boolean otherHor = Ball.doubleEquals(other.end.getY(), other.start.getY());
+        boolean thisVert = doubleEquals(end.getX(), start.getX());
+        boolean otherVert = doubleEquals(other.end.getX(), other.start.getX());
+        boolean thisHor = doubleEquals(end.getY(), start.getY());
+        boolean otherHor = doubleEquals(other.end.getY(), other.start.getY());
 
         if (thisVert && otherVert) {
-            return Ball.doubleEquals(start.getX(), other.start.getX())
+            return doubleEquals(start.getX(), other.start.getX())
                     && rangesOverlap(start.getY(), end.getY(), other.start.getY(), other.end.getY());
         }
 
         if (thisHor && otherHor) {
-            return Ball.doubleEquals(start.getY(), other.start.getY())
+            return doubleEquals(start.getY(), other.start.getY())
                     && rangesOverlap(start.getX(), end.getX(), other.start.getX(), other.end.getX());
         }
 
@@ -306,10 +311,10 @@ public class Line {
         Double m2 = otherVert ? null
                 : (other.end.getY() - other.start.getY()) / (other.end.getX() - other.start.getX());
 
-        if (m1 != null && m2 != null && Ball.doubleEquals(m1, m2)) {
+        if (m1 != null && m2 != null && doubleEquals(m1, m2)) {
             double b1 = start.getY() - m1 * start.getX();
             double b2 = other.start.getY() - m2 * other.start.getX();
-            return Ball.doubleEquals(b1, b2)
+            return doubleEquals(b1, b2)
                     && rangesOverlap(start.getX(), end.getX(), other.start.getX(), other.end.getX());
         }
 
@@ -323,7 +328,7 @@ public class Line {
     }
 
     private boolean isBetween(double val, double bound1, double bound2) {
-        return (val > Math.min(bound1, bound2) || Ball.doubleEquals(val, Math.min(bound1, bound2)))
-                && (val < Math.max(bound1, bound2) || Ball.doubleEquals(val, Math.max(bound1, bound2)));
+        return (val > Math.min(bound1, bound2) || doubleEquals(val, Math.min(bound1, bound2)))
+                && (val < Math.max(bound1, bound2) || doubleEquals(val, Math.max(bound1, bound2)));
     }
 }
