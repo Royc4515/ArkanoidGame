@@ -8,6 +8,10 @@
     <target name="compile">
         <mkdir dir="bin"/>
         <javac classpath="${classpath}" srcdir="src" destdir="bin" includeantruntime="false"/>
+        <!-- Copy image resources so they are reachable on the classpath -->
+        <copy todir="bin">
+            <fileset dir="." includes="*.jpg,*.png,*.gif"/>
+        </copy>
     </target>
 
     <target name="clean">

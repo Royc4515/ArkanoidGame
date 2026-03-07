@@ -8,8 +8,8 @@
 import game.Game;
 
 /**
- * The {@code main.Ass3Game} class serves as the entry point for launching
- * the third assignment's game application. It creates a {@link Game}
+ * The {@code Ass5Game} class serves as the entry point for launching
+ * the game application. It creates a {@link Game}
  * instance, initializes it with all game elements (background, paddle,
  * balls, blocks, etc.), and starts the game loop.
  */

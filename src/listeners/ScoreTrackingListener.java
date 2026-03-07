@@ -19,16 +19,15 @@ public class ScoreTrackingListener implements HitListener {
     }
 
     /**
-     * Updates the score when a block is hit and removed by a ball.
-     * Adds 5 points only if the block is removable and the ball color did not match the block.
+     * Updates the score when a block is destroyed. Adds 5 points per block.
+     * This is only invoked by {@link Block#hit} when the block is removable
+     * and the ball color did not match, so no re-check is needed here.
      *
      * @param beingHit the block that was hit
      * @param hitter the ball that hit the block
      */
     @Override
     public void hitEvent(Block beingHit, Ball hitter) {
-        if (beingHit.isRemovable() && !beingHit.ballColorMatch(hitter)) {
-            currentScore.increase(5);
-        }
+        currentScore.increase(5);
     }
 }
