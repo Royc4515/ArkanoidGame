@@ -1,66 +1,107 @@
-# 🧱 Arkanoid Game (Assignment 5)
+Arkanoid clone in Java 17 — focused on clean OOP design patterns and a custom geometry engine.
 
-> A fast-paced, object-oriented implementation of the classic arcade game Arkanoid.
+## Architecture
 
-![Java](https://img.shields.io/badge/Java-17%2B-orange)
-![License](https://img.shields.io/badge/License-MIT-blue)
-![Course](https://img.shields.io/badge/Course-OOP-green)
+Three design patterns structure the codebase:
 
-## 🎮 Overview
+**Observer** — `HitNotifier` / `HitListener` interfaces
+`Block` implements `HitNotifier` and maintains a list of `HitListener` subscribers. On each hit it calls `hitEvent(Block, Ball)` on every registered listener. Concrete listeners: `BlockRemover` (removes the block and decrements a counter), `BallRemover` (removes the ball when it reaches the death region), `ScoreTrackingListener` (adds 5 points per destroyed block).
 
-Welcome to my Java implementation of Arkanoid! This project was built as part of an extensive Object-Oriented Programming (OOP) assignment. It features a custom game engine, sprite management, collision detection, and a scoring system.
+**Composite** — `SpriteCollection`, `GameEnvironment`
+`SpriteCollection` holds all `Sprite` objects and fans out `drawAllOn()` and `notifyAllTimePassed()` calls. `GameEnvironment` holds all `Collidable` objects and exposes `getClosestCollision(Line trajectory)`, which iterates every collidable and returns the closest intersection point.
 
-**Key Features:**
-*   **Smooth Animation Loop**: Custom-built game loop running at 60 FPS.
-*   **Collision Detection**: Precise physics for ball-block and ball-paddle interactions.
-*   **Dynamic Gameplay**: Colored blocks to destroy, with "Death Regions" to avoid.
-*   **Pause Feature**: Need a break? Just hit `P`.
+**Factory Method** — `Velocity.fromAngleAndSpeed`
+`Velocity.fromAngleAndSpeed(double angle, double speed)` is a static factory that converts a polar (angle, speed) pair into Cartesian (dx, dy) components. Angle 0° points right; 90° points upward (y-axis inverted). Used everywhere a velocity is created from game logic.
 
-## 👾 The Lore (Fun Fact)
-You might notice something special about the game's background...
+---
 
-> 🎨 **Behind the Scenes**: The background image is an AI-generated masterpiece featuring the **Mighty Hero of OOP, Zvika Berger**, in an epic attempt to explain complex software design patterns to our lecturer, **Dr. Marina Kogan**. Does he succeed? Only by clearing all the blocks can you find out!
+## Geometry Engine
 
-## 🕹️ Game Controls
+All geometry lives in the `geometry/` package and is used by the collision system.
+
+**Line-segment intersection (`Line.intersectionWith`)** — 4-case dispatch:
+1. Both segments vertical → `handleParallelIntersection(..., vertical=true)`: checks they share the same x, then returns a touching endpoint or null.
+2. Both segments horizontal → `handleParallelIntersection(..., vertical=false)`: same logic on y.
+3. Same finite slope → `handleCollinearIntersection()`: checks they lie on the same line (matching y-intercept), returns a shared endpoint or null.
+4. General case → `calculateIntersection()`: solves with slope-intercept algebra, then verifies the candidate point lies within both segments using `isBetween()`.
+
+**Epsilon floating-point comparison**
+`EPSILON = 1e-5`. Every equality test uses `doubleEquals(a, b)` → `Math.abs(a - b) < EPSILON`. Applied consistently to slope comparisons, boundary checks, and point equality in `Point.equals()`.
+
+**AABB collision detection**
+`Rectangle` exposes four `Line` border segments (top, left, bottom, right). `Line.closestIntersectionToStartOfLine(Rectangle)` collects all border intersections and returns the one nearest the trajectory start. `GameEnvironment.getClosestCollision(Line trajectory)` runs this over every registered `Collidable` and returns the globally closest hit.
+
+**5-zone paddle deflection (`Paddle.hit`)**
+The paddle surface is divided into five equal regions. Region is computed as `(int)((x - paddleLeft) / (paddleWidth / 5)) + 1`, clamped to [1, 5]. Each region returns a fixed-angle velocity at the current ball speed:
+- Region 1: 120° (sharp left-up)
+- Region 2: 150° (soft left-up)
+- Region 3: straight up — `new Velocity(dx, -|dy|)` preserving horizontal component
+- Region 4: 30° (soft right-up)
+- Region 5: 60° (sharp right-up)
+
+---
+
+## Class Structure
+
+```
+src/
+├── game/
+│   ├── Game.java            — initializes 800×600 window, 60 FPS loop, pause (P/Space), win/lose screens
+│   ├── GameEnvironment.java — registry of Collidables; closest-collision queries
+│   ├── SpriteCollection.java— registry of Sprites; fans out draw and time-step calls
+│   ├── Collidable.java      — interface: getCollisionRectangle(), hit(Ball, Point, Velocity)
+│   ├── Sprite.java          — interface: drawOn(DrawSurface), timePassed()
+│   └── CollisionInfo.java   — value object: collision point + collidable reference
+│
+├── geometry/
+│   ├── Point.java           — 2D point; distance(); epsilon-based equals()
+│   ├── Line.java            — segment; 4-case intersectionWith(); closestIntersectionToStartOfLine()
+│   ├── Rectangle.java       — AABB; four border Lines; intersectionPoints(Line)
+│   └── Velocity.java        — (dx,dy) vector; fromAngleAndSpeed() factory; applyToPoint()
+│
+├── sprites/
+│   ├── Ball.java            — moves via moveOneStep(); queries GameEnvironment; handles stuck-ball ejection
+│   ├── Paddle.java          — keyboard-driven; 5-zone hit() deflection; bounded by x∈[20,780]
+│   ├── Block.java           — Collidable + HitNotifier; isRemovable and isDeathRegion flags
+│   ├── Background.java      — full-screen background image sprite
+│   └── ScoreIndicator.java  — renders current score at top of screen
+│
+└── listeners/
+    ├── HitListener.java         — interface: hitEvent(Block, Ball)
+    ├── HitNotifier.java         — interface: addHitListener(), removeHitListener()
+    ├── BlockRemover.java        — removes block from game; decrements remainingBlocks counter
+    ├── BallRemover.java         — removes ball from game; decrements remainingBalls counter
+    ├── ScoreTrackingListener.java — adds 5 points on each block hit
+    └── Counter.java             — simple int counter with increase/decrease/getValue
+```
+
+---
+
+## Controls
 
 | Key | Action |
-| :---: | :--- |
-| **⬅️ Left Arrow** | Move Paddle Left |
-| **➡️ Right Arrow** | Move Paddle Right |
-| **P** | Pause Game |
-| **Space** | Resume Game (from Pause) |
+|-----|--------|
+| Left Arrow | Move paddle left |
+| Right Arrow | Move paddle right |
+| P | Pause |
+| Space | Resume (from pause) |
 
-## 🚀 How to Run
+---
 
-### Prerequisites
-*   **Java Development Kit (JDK)**: Version 17 or higher.
+## Run
 
-### Quick Start (Recommended)
-We've included a handy script to handle the classpath for you. Just run:
+**Prerequisites:** JDK 17+
 
+**Quick start (PowerShell script handles the classpath):**
 ```powershell
 ./run_game.ps1
 ```
 
-### Manual Run
-If you prefer the command line:
+**Manual:**
+```bash
+# Compile
+javac -cp "biuoop-1.4.jar;src" src/Ass5Game.java -d bin
 
-1.  **Compile:**
-    ```bash
-    javac -cp "biuoop-1.4.jar;src" src/Ass5Game.java -d bin
-    ```
-2.  **Run:**
-    ```bash
-    java -cp "biuoop-1.4.jar;bin" Ass5Game
-    ```
-
-## 📂 Project Structure
-*   `src/`: Main source code (Game logic, Sprites, Geometry, Listeners).
-*   `biuoop-1.4.jar`: The graphics library used for the GUI.
-*   `run_game.ps1`: Automation script for easy execution.
-
-## 📜 License
-This project is open-source and available under the [MIT License](LICENSE).
-
----
-*Created by Roy Yanai Carmelli*
+# Run
+java -cp "biuoop-1.4.jar;bin" Ass5Game
+```
